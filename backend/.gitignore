@@ -1,0 +1,16 @@
+# Producción
+node_modules/
+.env
+
+# Desarrollo
+*.log
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+
+# Temporal
+temp/
+tmp/

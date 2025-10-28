@@ -1,0 +1,187 @@
+<div class="login-container">
+  <div class="login-form animate__animated animate__fadeInUp">
+    <h1>Prueba Hydra</h1>
+
+    <!-- Mostrar usuario autenticado -->
+    @if (isAuthenticated()) {
+    <div class="user-dashboard animate__animated animate__fadeIn">
+      <div class="welcome-message">
+        <h2>¡Bienvenido!</h2>
+        <p>Has iniciado sesión exitosamente.</p>
+        @if (currentUser()) {
+        <div class="user-info">
+          <p><strong>Email:</strong> {{ currentUser()?.email }}</p>
+          <p><strong>Último login:</strong> {{ currentUser()?.lastLogin | date : 'medium' }}</p>
+        </div>
+        }
+      </div>
+      <button
+        type="button"
+        class="logout-btn animate__animated animate__pulse animate__infinite"
+        (click)="logout()"
+      >
+        Cerrar Sesión
+      </button>
+    </div>
+    } @else {
+    <!-- Pestañas para Login/Registro -->
+    <div class="tab-container">
+      <button
+        type="button"
+        class="tab-btn"
+        [class.active]="isLoginMode()"
+        (click)="isLoginMode() || toggleMode()"
+      >
+        Iniciar Sesión
+      </button>
+      <button
+        type="button"
+        class="tab-btn"
+        [class.active]="!isLoginMode()"
+        (click)="!isLoginMode() || toggleMode()"
+      >
+        Registrarse
+      </button>
+    </div>
+
+    <!-- Formulario de autenticación -->
+    <form
+      [formGroup]="authForm"
+      (ngSubmit)="onSubmit()"
+      class="animate__animated animate__fadeInUp"
+    >
+      <!-- Mostrar errores -->
+      @if (loginError()) {
+      <div class="error-alert animate__animated animate__shakeX">
+        <p>{{ loginError() }}</p>
+        <button type="button" class="close-btn" (click)="clearError()">×</button>
+      </div>
+      }
+
+      <div class="form-group">
+        <label for="email">Email:</label>
+        <input
+          type="email"
+          id="email"
+          formControlName="email"
+          [class.error]="authForm.get('email')?.invalid && authForm.get('email')?.touched"
+          placeholder="Ingresa tu email"
+        />
+        @if (authForm.get('email')?.invalid && authForm.get('email')?.touched) {
+        <span class="error-message">
+          @if (authForm.get('email')?.errors?.['required']) { Email requerido } @else if
+          (authForm.get('email')?.errors?.['email']) { Formato de email inválido }
+        </span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="password">Contraseña:</label>
+        <input
+          type="password"
+          id="password"
+          formControlName="password"
+          [class.error]="authForm.get('password')?.invalid && authForm.get('password')?.touched"
+          placeholder="Ingresa tu contraseña"
+        />
+        @if (authForm.get('password')?.invalid && authForm.get('password')?.touched) {
+        <span class="error-message">
+          @if (authForm.get('password')?.errors?.['required']) { Contraseña requerida } @else if
+          (authForm.get('password')?.errors?.['passwordStrength']) {
+          <div class="password-requirements">
+            La contraseña debe tener:
+            <ul>
+              <li
+                [class.valid]="authForm.get('password')?.errors?.['passwordStrength']?.hasMinLength"
+              >
+                • Al menos 6 caracteres
+              </li>
+              <li
+                [class.valid]="authForm.get('password')?.errors?.['passwordStrength']?.hasLowerCase"
+              >
+                • Una letra minúscula
+              </li>
+              <li
+                [class.valid]="authForm.get('password')?.errors?.['passwordStrength']?.hasUpperCase"
+              >
+                • Una letra mayúscula
+              </li>
+              <li [class.valid]="authForm.get('password')?.errors?.['passwordStrength']?.hasNumber">
+                • Un número
+              </li>
+            </ul>
+          </div>
+          }
+        </span>
+        }
+      </div>
+
+      <!-- Campo de confirmación solo para registro -->
+      @if (!isLoginMode()) {
+      <div class="form-group">
+        <label for="confirmPassword">Confirmar Contraseña:</label>
+        <input
+          type="password"
+          id="confirmPassword"
+          formControlName="confirmPassword"
+          [class.error]="
+            authForm.get('confirmPassword')?.invalid && authForm.get('confirmPassword')?.touched
+          "
+          placeholder="Confirma tu contraseña"
+        />
+        @if (authForm.get('confirmPassword')?.invalid && authForm.get('confirmPassword')?.touched) {
+        <span class="error-message"> Confirmación de contraseña requerida </span>
+        }
+      </div>
+      }
+
+      <button
+        type="submit"
+        [disabled]="authForm.invalid || isLoading()"
+        class="submit-btn animate__animated animate__pulse"
+      >
+        @if (isLoading()) {
+        <span class="loading-spinner"></span>
+        @if (isLoginMode()) { Iniciando sesión... } @else { Registrando... } } @else { @if
+        (isLoginMode()) { Iniciar Sesión } @else { Registrarse } }
+      </button>
+    </form>
+
+    <!-- Información para pruebas -->
+    <div class="test-info animate__animated animate__fadeInUp animate__delay-1s">
+      <h3>Información para pruebas:</h3>
+      <p><strong>Backend:</strong> http://localhost:3000</p>
+      <p><strong>Modo actual:</strong> {{ isLoginMode() ? 'Login' : 'Registro' }}</p>
+
+      @if (!isLoginMode()) {
+      <div class="password-info">
+        <p><strong>Requisitos de contraseña:</strong></p>
+        <ul>
+          <li>Mínimo 6 caracteres</li>
+          <li>Al menos una letra minúscula (a-z)</li>
+          <li>Al menos una letra mayúscula (A-Z)</li>
+          <li>Al menos un número (0-9)</li>
+        </ul>
+        <p><em>Ejemplo válido: "MiPass123"</em></p>
+      </div>
+      }
+
+      <p><strong>Endpoints disponibles:</strong></p>
+      <ul>
+        <li>POST /api/auth/register - Registrar usuario</li>
+        <li>POST /api/auth/login - Iniciar sesión</li>
+        <li>GET /api/auth/profile - Perfil de usuario</li>
+      </ul>
+      <p>
+        <em
+          >{{
+            isLoginMode()
+              ? 'Crea una cuenta nueva usando la pestaña "Registrarse"'
+              : 'Crea tu cuenta y luego inicia sesión'
+          }}.</em
+        >
+      </p>
+    </div>
+    }
+  </div>
+</div>
