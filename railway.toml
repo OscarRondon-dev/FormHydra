@@ -1,0 +1,9 @@
+[build]
+builder = "NIXPACKS"
+
+[deploy]
+startCommand = "npm start"
+
+# Variables de entorno
+[build.env]
+NODE_ENV = "production"
