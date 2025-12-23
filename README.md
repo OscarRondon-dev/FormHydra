@@ -85,5 +85,5 @@ JWT_EXPIRES_IN=24h
 | GET | `/health` | Estado del servidor | - |
 
 ---
-
+**⚠️ Nota: Este proyecto tiene fines estrictamente educativos para entender cómo funcionan los ataques de fuerza bruta y cómo protegerse de ellos. No lo utilices en entornos que no sean de tu propiedad.**
 **¡Listo para usar con Hydra!** 🎉
